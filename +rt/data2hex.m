@@ -15,13 +15,6 @@ if nargin <=2
 else
     output_flag = 1;
 end
-
- str_len= rem(N_bit,4);
-if str_len~=0
-    disp('二进制位数必须为4的倍数');
-    return
-end
-
 disp('数据将按照列重新排列...');
 input_data = input_data(:);
 input_data = input_data ./ max(abs(input_data)) .* (2^(N_bit-1)-1);
