@@ -9,12 +9,11 @@
 %   fs 生成速率，按照多少速率来生成信号
 %   K  函数系数
 %   Window频率窗函数选择,输入窗函数,例如@hamming,@taylorwin
-%   信号旋转方向,0默认正向逆时针,1顺时针
 %--------------------------------------------------------------------------
 %   example
-%   nlm_wave(20e-6,100e6,10e6,1,@hamming)
-%   nlm_wave(20e-6,100e6,10e6,1,@hamming,0)
-%   nlm_wave(20e-6,100e6,10e6,1,@hamming,1)
+%   nlm_wave(20e-6,100e6,10e6,@hamming)
+%   nlm_wave(20e-6,100e6,10e6,@hamming)
+%   nlm_wave(20e-6,100e6,10e6,@hamming)
 %--------------------------------------------------------------------------
 function sig = nlm_wave(T,fs,bw,window)
 N  = round(fs * T);
