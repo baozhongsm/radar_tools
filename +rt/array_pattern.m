@@ -36,8 +36,8 @@
 %       w           导向矢量+窗函数，按照阵元的顺序写，角度和幅度 复数
 %       sub_angle   对应array中的子阵元主轴中心指向角度，例如圆阵指向角度
 %                   并不像线阵一样都是0度,而是如[-4 -2 0 2 4]这样
-%       sub_patten  子阵元天线方向图,-180~179度,间距1度,第二列为振幅增益
-%       sub_patten =    |-180 A1|
+%       sub_pattern  子阵元天线方向图,-180~179度,间距1度,第二列为振幅增益
+%       sub_pattern =    |-180 A1|
 %                       |-179 A2|
 %                       |-178 A3|
 %                       | ... ..|
@@ -56,7 +56,7 @@
 %--------------------------------------------------------------------------
 % shape = [0 0 0 0;-1.5 -0.5 0.5 1.5;0 0 0 0];
 % lambda = 2;
-% [theta,E] = array_patten(shape,lambda);
+% [theta,E] = array_pattern(shape,lambda);
 % figure(1)
 % plot(theta,pow2db(abs(E).^2));grid on;
 %--------------------------------------------------------------------------
@@ -74,7 +74,7 @@
 % lambda = 2;
 % w_angle = -20;
 % w = exp(-1i*2*pi/lambda*1*sind(w_angle)).^(0:5)'; 
-% [theta,E] = array_patten(shape,lambda,w_angle,w);
+% [theta,E] = array_pattern(shape,lambda,w_angle,w);
 % figure(2)
 % plot(theta,pow2db(abs(E).^2));grid on;
 %--------------------------------------------------------------------------
@@ -91,15 +91,16 @@
 %   example 3
 %   暂无例子
 %--------------------------------------------------------------------------
-function [theta_angle,E] = array_patten(array,...
+function [theta_angle,E] = array_pattern(array,...
                                         lambda,...
                                         w_angle,...
                                         w,...
                                         sub_angle,...
-                                        sub_patten)
+                                        sub_pat)
 c = 299792458;                                                              %光速
 k = 2*pi/lambda;                                                            %波数
-theta_angle = -180:179;                                                     %输出角度
+step = 0.1;
+theta_angle = -180:step:179;                                                     %输出角度
 tgt_range = 10000*lambda;
 %--------------------------------------------------------------------------
 %   输入变量数量判断
@@ -108,20 +109,26 @@ if nargin <= 2
     w_angle = 0;
     w = ones(1,length(array));
     sub_angle = zeros(1,length(array));
-    sub_patten =[-180:179;ones(1,360)]';
+    sub_pat =[-180:179;ones(1,360)]';
 elseif nargin <=4
     sub_angle = zeros(1,length(array));
-    sub_patten =[-180:179;ones(1,360)]';
+    sub_pat =[-180:179;ones(1,360)]';
 end
 %--------------------------------------------------------------------------
-for degree = -180:179                                                       %目标电磁波角度穷举
-    point = degree+181;
+%   子阵天线方向图插值到0.01
+%--------------------------------------------------------------------------
+
+sp(:,1) = theta_angle;
+sp(:,2) = interp1(sub_pat(:,1),sub_pat(:,2),theta_angle);
+point = 1;
+for degree = -180:step:179                                                  %目标电磁波角度穷举
     tgt = [tgt_range*cosd(degree);tgt_range*sind(-degree);0];               %目标空间坐标
     for index = 1:length(array(1,:))                                        %子阵元循环
-        A_sub_angle = circshift(sub_patten,sub_angle(index)-w_angle);
+        A_sub_angle = circshift(sp,round((sub_angle(index)-w_angle)/step));
         E(point,index) = exp(-1j*k*norm(tgt - array(:,index))).*...
                       w(index).*...
                       A_sub_angle(point,2);
     end
+    point = point + 1;
     E = sum(E,2);                                                           %电场矢量叠加
 end
