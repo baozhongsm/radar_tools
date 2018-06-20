@@ -47,12 +47,14 @@ if isreal(sig)==1                                                           %ÊµÐ
     plot3(1:length(A),real(A),imag(A));grid on
     xlabel('µãÊý');ylabel('Êµ²¿');zlabel('Ðé²¿')
     axis([0 length(A) -max(abs(A)) max(abs(A)) -max(abs(A)) max(abs(A))])
-    %----------------------------------------------------------------------
-    if nargin ==3                                                           %Èç¹û²»ÊäÈë ×Ô¶¯Ñ°ÕÒ×î´óÖµ
+    %----------------------------------------------------------------------    
+    if nargin <=3                                                           %Èç¹û²»ÊäÈë ×Ô¶¯Ñ°ÕÒ×î´óÖµ
         select = find(A==max(A));
         ang = rad2deg(angle(A(select)));
     end
-    ang = rad2deg(angle(A(select)));
+    if nargin ==4                                                           %Èç¹û²»ÊäÈë ×Ô¶¯Ñ°ÕÒ×î´óÖµ
+        ang = rad2deg(angle(A(select)));
+    end
     title(['µã ' num2str(select) ' ÏàÎ»Îª ' num2str(ang) ' ¡ã']);
     %----------------------------------------------------------------------
 else                                                                        %¸´ÐÅºÅ·ÖÎö£¬µ¥±ß¹¦ÂÊÆ×
@@ -79,11 +81,15 @@ else                                                                        %¸´Ð
     xlabel('µãÊý');ylabel('Êµ²¿');zlabel('Ðé²¿');
     axis([0 length(A) -max(abs(A)) max(abs(A)) -max(abs(A)) max(abs(A))])
     %----------------------------------------------------------------------
-    if nargin ==3                                                           %Èç¹û²»ÊäÈë ×Ô¶¯Ñ°ÕÒ×î´óÖµ
+    if nargin <=3                                                           %Èç¹û²»ÊäÈë ×Ô¶¯Ñ°ÕÒ×î´óÖµ
         select = find(A==max(A));
         ang = rad2deg(angle(A(select)));
     end
-    ang = rad2deg(angle(A(select)));
+    
+    if nargin ==4
+        ang = rad2deg(angle(A(select)));
+    end
     title(['µã ' num2str(select) ' ÏàÎ»Îª ' num2str(ang) ' ¡ã']);
     %----------------------------------------------------------------------
+
 end
