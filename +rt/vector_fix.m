@@ -9,5 +9,5 @@
 %   程序会自动计算补偿量
 %   然后将补偿信号(复数)乘以补偿量就可以修正到基准信号
 %--------------------------------------------------------------------------
-function [fix_vector] = error_fix(basic_sig,test_sig)
-fix_vector = basic_sig * conj(test_sig) ./ abs(test_sig)^2;
+function [fix_vector] = vector_fix(basic_sig,test_sig)
+fix_vector = basic_sig .* conj(test_sig) ./ abs(test_sig).^2;

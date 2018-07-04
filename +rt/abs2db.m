@@ -6,4 +6,5 @@
 %--------------------------------------------------------------------------
 function dataout = abs2db(datain)
 dataout = pow2db(abs(datain).^2);
+dataout = dataout - max(dataout(:));
 end

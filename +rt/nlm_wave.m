@@ -3,7 +3,7 @@
 %   qwe14789cn@gmail.com
 %   201800514
 %--------------------------------------------------------------------------
-%   h_output = nlm_wave(T,bw,fs,K,Window)
+%   h_output = nlm_wave(T,bw,fs,Window)
 %   bw 信号带宽,分布是从-bw/2到bw/2
 %   T  信号长度
 %   fs 生成速率，按照多少速率来生成信号
@@ -15,7 +15,7 @@
 %   nlm_wave(20e-6,100e6,10e6,@hamming)
 %   nlm_wave(20e-6,100e6,10e6,@hamming)
 %--------------------------------------------------------------------------
-function sig = nlm_wave(T,fs,bw,window)
+function sig = nlm_wave(T,bw,fs,window)
 N  = round(fs * T);
 f  = -bw/2:bw/N:bw/2 - bw/N;
 t  = 0:1/fs:T - 1/fs;

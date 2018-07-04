@@ -5,6 +5,5 @@
 %   p3(sig)
 %--------------------------------------------------------------------------
 function p3(signal)
-figure
 plot3(1:length(signal),real(signal),imag(signal));grid on
 xlabel('点数');ylabel('实部');zlabel('虚部')
