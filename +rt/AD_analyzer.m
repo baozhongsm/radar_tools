@@ -22,7 +22,7 @@
 %   rt.AD_analyzer(sig,fs,AD_len,N_waves,N_sep,Nfft)
 %   rt.AD_analyzer(sig,fs,AD_len,N_waves,N_sep,Nfft,rho)
 %--------------------------------------------------------------------------
-function [F,P] = AD_analyzer(sig,fs,AD_len,N_waves,N_sep,Nfft,rho)
+function [F,P] = ad_analyzer(sig,fs,AD_len,N_waves,N_sep,Nfft,rho)
 disp('要求:输入信号必须满载,满载输入时的有效位数最高')
 if nargin <=3
     disp('输入变量至少需要：信号，采样率，AD长度，谐波数量');
