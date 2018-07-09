@@ -4,101 +4,95 @@
 %   信号频谱自动化分析工具
 %--------------------------------------------------------------------------
 %   输入:
-%   sig     信号
-%   fs      采样速率
-%   AD_len  AD位数
-%   N_waves 除主频率外谐波数量
-%   N_sep   主频率+谐波隔离点数              默认10
-%   Nfft    fft点数                         默认10
-%   rho     频率分辨率0表示最高              默认10
+%   sig         信号
+%   bw_range    分析带宽
+%   fs          采样速率
+%   sep_N       信号隔离点数
+%   AD_len      AD位数
+%   flag        饱和 非饱和标记位 默认为0 非饱和  1 饱和
 %	输出：
-%   F       频率轴
-%   P       功率数据
+%   ENOB        有效位
 %--------------------------------------------------------------------------
 %   example
 %--------------------------------------------------------------------------
-%   rt.AD_analyzer(sig,fs,AD_len,N_waves)
-%   rt.AD_analyzer(sig,fs,AD_len,N_waves,N_sep)
-%   rt.AD_analyzer(sig,fs,AD_len,N_waves,N_sep,Nfft)
-%   rt.AD_analyzer(sig,fs,AD_len,N_waves,N_sep,Nfft,rho)
+%   rt.ad_analyzer(sig,[8.5e6 11.5e6],fs,70,14)
+%   rt.ad_analyzer(sig,[8.5e6 11.5e6],fs,70,14,1)
 %--------------------------------------------------------------------------
-function [F,P] = ad_analyzer(sig,fs,AD_len,N_waves,N_sep,Nfft,rho)
-disp('要求:输入信号必须满载,满载输入时的有效位数最高')
-if nargin <=3
-    disp('输入变量至少需要：信号，采样率，AD长度，谐波数量');
-    return
-elseif nargin <=4
-    N_sep = 10;
-    Nfft  = 1024;
-    rho   = 10;
-elseif nargin <=5
-	Nfft  = 1024;
-    rho   = 10; 
-elseif nargin <=6
-	rho   = 10;
+function ad_analyzer(sig,bw_range,fs,sep_N,AD_len,flag)
+if nargin <=5
+    flag = 1;
+end
+disp('------------------------------------------------------------')
+disp('注意：AD测试须满足以下公式不会发生频谱泄露')
+disp('M/N=Fin/Fs')
+disp('M为时域的周期数，N为采点数，Fs为采样频率，Fin为信号频率')
+disp('------------------------------------------------------------')
+disp('1.如果输入信号信噪比 饱和 = 1.76+6.02*AD位数');
+disp('请将最后一项设置为1')
+disp('rt.ad_analyzer(sig,[0 fs/2],fs,sep_N,AD_len,1)')
+disp('------------------------------------------------------------')
+disp('2.如果输入信号信噪比 不饱和 <= 1.76+6.02*AD位数');
+disp('请将最后一项设置为0 或者不设置')
+disp('rt.ad_analyzer(sig,[0 fs/2],fs,sep_N,AD_len)')
+disp('------------------------------------------------------------')
+disp('3.如果输入信号信噪比是在一定带宽计算得到');
+disp('请将最后一项设置为1,并设定带宽范围')
+disp('rt.ad_analyzer(sig,[8e6 12e6],fs,sep_N,AD_len,1)')
+disp('------------------------------------------------------------')
+disp('数据分析');
+disp('------------------------------------------------------------')
+Nfft = 2^nextpow2(length(sig));                                             %自动计算fft点数
+x = 0:fs/Nfft:fs/2 - fs/Nfft;                                               %频率横坐标
+f = fft(sig,Nfft);
+f = f(1:Nfft/2);
+a = abs(f);
+p = a.^2;
+db = pow2db(p);
+db = db - max(db(:));
+%--------------------------------------------------------------------------
+%   拿到最高频率点
+%--------------------------------------------------------------------------
+loc = find(p==max(p));
+p_max = p(loc);
+N_range = [ceil(min(bw_range)/fs*Nfft+0.1):(loc-sep_N) ...
+           (loc+sep_N):floor(max(bw_range)/fs*Nfft)];                       %分析点数范围
+SNR = pow2db(p_max./sum(p(N_range)));
+if flag ==0
+    ENOB = (SNR - 1.76 - 20*log10(max(sig(:))./2^(AD_len-1)))/6.02;
+end
+if flag ==1
+    ENOB = (SNR - 1.76)/6.02;
 end
 
-[P,F] = pwelch(sig,kaiser(length(sig),rho),[],Nfft,fs);                     %获得频谱图
-db = pow2db(P);                                                             %换算成db
-
-maxloc = find(db==max(db));                                                 %信号最大频率坐标
-[~,loc] = findpeaks(db,'MinPeakDistance',(2*Nfft/100));                     %峰值频率坐标
-
-N = round(N_waves/2);                                                       %谐波数量
-mid = find(loc ==maxloc);                                                   %中心信号
-X = loc(mid-N:mid+N);                                                       %谐波+主频坐标
-XX = [X-N_sep X+N_sep];                                                     %谐波坐标挖去范围
-
-NDR = 0.5 * mean(P(1:(loc(mid)-N_sep))) + ...                               %除去主信号后所有平均功率
-      0.5 * mean(P((loc(mid)+N_sep):end));
-NDR = pow2db(NDR);
-
-for idx = 1:size(XX,1)
-    Y(idx,:) =  XX(idx,1):XX(idx,2);
+fprintf('分析频率范围 %1.2fMhz ~ %1.2fMhz\n',bw_range/1e6);
+fprintf('信号左右隔离点数 %d\n',sep_N);
+fprintf('信噪比SNR = %1.2f dB,',SNR);
+if flag ==0
+    fprintf('非饱和状态补偿ENOB = %1.2f\n',ENOB);
+elseif flag==1
+    fprintf('饱和状态计算ENOB = %1.2f\n',ENOB);
 end
-Y = Y';                                                                     %计算谐波坐标尺度
-n_loc=Y(:);                                                                 %挖去坐标所有点
-n_loc = [(1:(loc(1)+N_sep))';n_loc;((loc(end)-N_sep):length(P))'];                          %添加直流挖去范围
+fprintf('AD位数为 %d 位,理论动态范围应为 %1.2f dB\n',[AD_len 2*pow2db(2^AD_len)]);
+
 
 %--------------------------------------------------------------------------
-%   排除挖去坐标获得低噪坐标
+%   频率分布
 %--------------------------------------------------------------------------
-x = 1:length(F);
-for idx = 1:length(n_loc)
-    x(x==n_loc(idx))=[];
+%   坐标修正
+%--------------------------------------------------------------------------
+if fs/1e6 > 1 && fs/1e9 < 1
+    x = x/1e6;
+    type = 1;
 end
-
-%--------------------------------------------------------------------------
-%   可视化
-%--------------------------------------------------------------------------
-figure;
-plot(F/1e6,db,'LineWidth',1.5);grid on;hold on;                             %原始信号
-plot(F(n_loc)/1e6,db(n_loc),'g-','LineWidth',1.2);                          %谐波,直流筛选
-plot(F(maxloc-N_sep:maxloc+N_sep)/1e6,db(maxloc-N_sep:maxloc+N_sep),...     %信号筛选
-    'r-','LineWidth',1.2);
-title('AD频谱分析')
-legend('频谱分析','谐波,直流筛选','信号筛选');xlabel('频率 MHz');ylabel('幅度 dB')
-hold off
-
-%--------------------------------------------------------------------------
-%   输出部分
-%--------------------------------------------------------------------------
-SNDR = db(maxloc) - NDR;
-SNR = db(maxloc)- pow2db(mean(P(x)));
-X(X==maxloc)=[];                                                            %剩下全是谐波的频率坐标
-ang = rad2deg(angle(max(fft(sig))));
-%--------------------------------------------------------------------------
-fprintf('-------------------------------------------------------------\n');
-fprintf("信号频率 -> %1.2f Mhz\n",F(maxloc)/1e6);
-fprintf('-------------------------------------------------------------\n');
-for idx = 1:length(X)
-    fprintf("谐波频率 -> %1.2f Mhz\n",F(X(idx))/1e6);
+if fs/1e3 > 1 && fs/1e6 < 1
+    x = x/1e3;
+    type = 2;
 end
-fprintf('-------------------------------------------------------------\n');
-fprintf('峰值角度    -> %1.2f°\n',ang);
-fprintf("理想信噪比  -> %1.2f dB\n",6.02*AD_len + 1.76);
-fprintf("实际信噪比  -> %1.2f dB\n",SNR);
-fprintf("信噪失真比  -> %1.2f dB\n",SNDR);
-fprintf("理想有效位  -> %1.2f \n",AD_len);
-fprintf("实际有效位  -> %1.2f \n",(SNDR-1.76)/6.02);
-fprintf('-------------------------------------------------------------\n');
+plot(x,db,x(N_range),db(N_range));legend('信号频谱','分析区间');
+if type==1
+    xlabel('频率 MHz')
+end
+if type==2
+    xlabel('频率 KHz')
+end
+ylabel('dB')
