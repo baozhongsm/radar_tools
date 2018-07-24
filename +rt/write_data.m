@@ -13,6 +13,10 @@
 %   rt.write_data(cos_data,,'%d,\n','a.txt')
 %--------------------------------------------------------------------------
 function write_data(data_name,data_type,file_name)
+[M,~] = size(data_name);
 f = fopen(file_name,'w');
-fprintf(f,data_type,data_name);
+for idx = 1:M
+            fprintf(f,data_type,data_name(idx,:));
+            fprintf(f,'\n');
+end
 fclose(f);
