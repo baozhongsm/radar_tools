@@ -1,22 +1,33 @@
 %--------------------------------------------------------------------------
-%   补码
-%   10进制－〉16进制
-%   20180419
-%   刘夏
-%   qwe14789cn@gmail.com
+%   rt toolbox
+%   author:qwe14789cn@gmail.com
+%   https://github.com/qwe14789cn/radar_tools
 %--------------------------------------------------------------------------
-%   h_output = d2h(data,N_bit)
-%   data    10进制原始数据
-%   N_bit   2进制下的位数
+%   [d] = rt.d2h(datain,N_bit)
 %--------------------------------------------------------------------------
-function h_output = d2h(data,N_bit)
-[X,Y,Z] = size(data);
-data(data<0) = data(data<0)+2^N_bit;
-h = dec2hex(data);
+%   Description:
+%   converse Decimal to Hex complement(ofen use for FPGA test)
+%--------------------------------------------------------------------------
+%   input:
+%           datain                  input data
+%           N_bit                   converse digit
+%   output:
+%           dataout                 output data
+%--------------------------------------------------------------------------
+%   Examples:   
+%   rt.d2h(13,5)
+%   ans = 
+%       "D"
+%--------------------------------------------------------------------------
+function dataout = d2h(datain,N_bit)
+[X,Y,Z] = size(datain);
+datain(datain<0) = datain(datain<0)+2^N_bit;
+h = dec2hex(datain);
+temp = string([]);
 for index = 1:X*Y*Z
     temp(index)= string(h(index,:));
 end
-h_output = reshape(temp,[X Y Z]);
+dataout = reshape(temp,[X Y Z]);
 
 
     

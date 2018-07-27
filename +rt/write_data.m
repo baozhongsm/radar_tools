@@ -1,18 +1,28 @@
 %--------------------------------------------------------------------------
-%   20180621
-%   数据写入输出txt文档
+%   rt toolbox
+%   author:qwe14789cn@gmail.com
+%   https://github.com/qwe14789cn/radar_tools
 %--------------------------------------------------------------------------
-%   write_data(data_name,data_type,file_name)
-%   输入：
-%   data_name   数据名称
-%   data_type   数据格式
-%   file_name   数据文件名
+%   rt.write_data(data_name,data_type,file_name)
 %--------------------------------------------------------------------------
-%   example
-%   cos_data = round(8191*real(rt.exp_wave(1/5e6,5e6,350e6)));
-%   rt.write_data(cos_data,,'%d,\n','a.txt')
+%   Description:
+%   write matrix data to *.txt or *.dat file.
+%--------------------------------------------------------------------------
+%   input:
+%           data_name               data name in workplace
+%           data_type               string,float,int or something
+%           file_name               the output filename
+%   output:
+%           None
+%--------------------------------------------------------------------------
+%   Examples:   
+%   a = [1 2 3;4 5 6;7 8 9];
+%   rt.write_data(a,'%d ','a.txt')
 %--------------------------------------------------------------------------
 function write_data(data_name,data_type,file_name)
 f = fopen(file_name,'w');
-fprintf(f,data_type,data_name);
+for idx = 1:size(data_name,2)
+    fprintf(f,data_type,data_name(idx,:));
+    fprintf(f,"\n");
+end
 fclose(f);

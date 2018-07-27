@@ -1,15 +1,22 @@
 %--------------------------------------------------------------------------
-%   点频波形生成
-%   qwe14789cn@gmail.com
-%   20180524
+%   rt toolbox
+%   author:qwe14789cn@gmail.com
+%   https://github.com/qwe14789cn/radar_tools
 %--------------------------------------------------------------------------
-%   h_output = exp_wave(T,fp,fs)
-%   T  信号长度
-%   fp 点频信号频率
-%   fs 生成速率，按照多少速率来生成信号
+%   [sig] = rt.exp_wave(T,fp,fs)
 %--------------------------------------------------------------------------
-%   example
-%   exp_wave(20e-6,10e6,100e6)
+%   Description:
+%   create complex waveform
+%--------------------------------------------------------------------------
+%   input:
+%           T                   input signal time
+%           fp                  signal frequency
+%           fs                  sample frequency
+%   output:
+%           sig                 output signal
+%--------------------------------------------------------------------------
+%   Examples:   
+%   rt.exp_wave(20e-6,1e6,5e6)
 %--------------------------------------------------------------------------
 function sig = exp_wave(T,fp,fs)
 t = (0:1/fs:T-1/fs)';
