@@ -19,8 +19,8 @@
 %   a = [1 2 3;4 5 6;7 8 9];
 %   rt.write_data(a,'%d ','a.txt')
 %--------------------------------------------------------------------------
-
-disp("输入信号按照列排列")
+function output = ddc_40m(sig,filter_coe,down_N)
+disp("保证输入信号按照列排列")
 long = size(sig,1);
 N = fix(long/4);
 M = rem(long,4);
@@ -37,4 +37,17 @@ I = reshape(I,1,4*(N+1));
 Q = reshape(Q,1,4*(N+1));
 I = I(1:(4*N+M))';
 Q = Q(1:(4*N+M))';
-output = sig.*I+1j.*sig.*Q;
+disp("IQ正交")
+
+sig_IQ = sig.*I+1j.*sig.*Q;
+disp('滤波')
+N = length(filter_coe);
+output = zeros(size(sig,1)+N-1,size(sig,2));
+for idx = 1:size(sig,2)
+    output(:,idx) = conv(sig_IQ(:,idx),filter_coe);
+end
+output = output(N:end,:);
+disp("抽取")
+output = downsample(output,down_N);
+
+
