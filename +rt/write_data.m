@@ -22,7 +22,7 @@
 function write_data(data_name,data_type,file_name)
 [M,~] = size(data_name);
 f = fopen(file_name,'w');
-for idx = 1:size(data_name,2)
+for idx = 1:size(data_name,1)
     fprintf(f,data_type,data_name(idx,:));
     fprintf(f,"\n");
 end
