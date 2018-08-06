@@ -4,8 +4,8 @@
 %   输入:
 %   datain      数据 列表示距离维
 %   pfa         虚警概率
-%   train_N     训练单元点数,左右两边总和
-%   guard_N     守护单元点数,左右两边总和
+%   train_N     训练单元点数,单边
+%   guard_N     守护单元点数,单边
 %   输出:
 %   detected    判决平面
 %   th          判决阈值
@@ -19,8 +19,8 @@
 %   example
 %   [detected,th] = p2cfar(datain,pfa,train_N,guard_N)
 %--------------------------------------------------------------------------
-function [detected,th] = p2cfar(datain,pfa,train_N,guard_N)
-cfar = phased.CFARDetector('NumTrainingCells',train_N,'NumGuardCells',guard_N);
+function [detected,th] = pow2cfar(datain,pfa,guard_N,train_N)
+cfar = phased.CFARDetector('NumTrainingCells',train_N*2,'NumGuardCells',guard_N*2);
 cfar.ProbabilityFalseAlarm = pfa;
 cfar.ThresholdOutputPort = true;
 cfar.ThresholdFactor = 'Auto';
