@@ -21,6 +21,6 @@
 %   -6.9897         0
 %--------------------------------------------------------------------------
 function [dataout] = abs2db(datain)
-dataout = pow2db(abs(datain).^2);
+dataout = db(datain);
 dataout = dataout - max(dataout(:));
 end
