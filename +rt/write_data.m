@@ -17,9 +17,9 @@
 %--------------------------------------------------------------------------
 %   Examples:   
 %   a = [1 2 3;4 5 6;7 8 9];
-%   rt.write_data(a,'%d ','a.txt')
+%   rt.write_data(a,'a.txt','%d ')
 %--------------------------------------------------------------------------
-function write_data(data_name,data_type,file_name)
+function write_data(data_name,file_name,data_type)
 [M,~] = size(data_name);
 f = fopen(file_name,'w');
 for idx = 1:size(data_name,1)
