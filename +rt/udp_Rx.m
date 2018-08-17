@@ -2,16 +2,16 @@ function Received = udp_Rx(port,package_size)
 udpRx = dsp.UDPReceiver('MessageDataType','uint8'); 
 udpRx.LocalIPPort = port;
 udpRx.ReceiveBufferSize = 65536;
-udpRx.MaximumMessageLength = 1024;
-TOTAL = package_size;
+udpRx.MaximumMessageLength = package_size(1);
+TOTAL = package_size(2);
 Rx = [];
-Received = uint8(zeros(1024));
+Received = uint8(zeros(package_size(1)));
 idx = 1;
 disp('waiting...')
 while TOTAL
     Rx = udpRx();
     if ~isempty(Rx)
-        Received(:,package_size-TOTAL+1) = Rx;
+        Received(:,package_size(2)-TOTAL+1) = Rx;
         TOTAL = TOTAL -1;
     end
 end
