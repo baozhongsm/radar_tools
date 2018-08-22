@@ -131,4 +131,3 @@ for degree = -180:step:179                                                  %Ä¿±
     end
     point = point + 1;
 end
-E = sum(E,2);                                                               %µç³¡Ê¸Á¿µþ¼Ó
