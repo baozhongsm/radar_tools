@@ -93,7 +93,6 @@
 %--------------------------------------------------------------------------
 function [theta_angle,E] = array_pattern(array,...
                                         lambda,...
-                                        w_angle,...
                                         w,...
                                         sub_angle,...
                                         sub_pat)
@@ -106,11 +105,10 @@ tgt_range = 10000*lambda;
 %   输入变量数量判断
 %--------------------------------------------------------------------------
 if nargin <= 2
-    w_angle = 0;
     w = ones(1,length(array));
     sub_angle = zeros(1,length(array));
     sub_pat =[-180:179;ones(1,360)]';
-elseif nargin <=4
+elseif nargin <=3
     sub_angle = zeros(1,length(array));
     sub_pat =[-180:179;ones(1,360)]';
 end
@@ -124,7 +122,7 @@ point = 1;
 for degree = -180:step:179                                                  %目标电磁波角度穷举
     tgt = [tgt_range*cosd(degree);tgt_range*sind(-degree);0];               %目标空间坐标
     for index = 1:length(array(1,:))                                        %子阵元循环
-        A_sub_angle = circshift(sp,round((sub_angle(index)-w_angle)/step));
+        A_sub_angle = circshift(sp,round(sub_angle(index)/step));
         E(point,index) = exp(-1j*k*norm(tgt - array(:,index))).*...
                       w(index).*...
                       A_sub_angle(point,2);
